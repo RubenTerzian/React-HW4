@@ -1,31 +1,55 @@
 import './css/App.css';
-import UserCard from './components/UserCard';
-import RegistrationForm from './components/RegistrationForm';
-import WinnerInfo from './components/WinnerInfo';
+import UserCardWithStore from './components/UserCard';
+import RegistrationFormWithStore from './components/RegistrationForm';
+import WinnerInfoWithStore from './components/WinnerInfo';
 import Input from './components/Input';
-import store from './store';
+import {connect} from 'react-redux';
 
-function App() {
-  const {getState} = store;
-  const {listOfUsers} = getState();
+
+const mapStateToProps = store => {
+  return {
+    listOfUsers: store.listOfUsers,
+    arrayForRender: store.arrayForRender,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    filter: (value) => {
+      dispatch({type: 'FILTER', payload: value});
+    }
+  };
+};
+
+
+function App(props) {
+  const {arrayForRender} = props;
+  const handleFilter = (e) => {
+    props.filter(e.target.value);
+  };
+  /* jshint ignore:start */
   return (
-    <div className="App">
-      <div className="users-container">
-        <Input name='searchParticipants'/>
-        <div className="users-cards">
-          {listOfUsers.map( user => {
-            console.log(user)
-            const {firstName, secondName} = user;
-              return <UserCard name={firstName} secondName={secondName}/>
-          })}
+      <div className="App">
+        <div className="users-container">
+          <Input 
+          name='searchParticipants' 
+          placeholder="Enter participant name..." 
+          onChange={handleFilter}
+          />
+          <div className="users-cards">
+            {arrayForRender.map( user => {
+                return <UserCardWithStore user={user}/>
+            })}
+          </div>
+        </div>
+        <div className="aside-container">
+          <RegistrationFormWithStore/>
+          <WinnerInfoWithStore/>
         </div>
       </div>
-      <div className="aside-container">
-        <RegistrationForm/>
-        <WinnerInfo/>
-      </div>
-    </div>
+
   );
+  /* jshint ignore:end */
 }
 
-export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);

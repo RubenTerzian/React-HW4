@@ -1,18 +1,31 @@
-import Button from "./Button"
+import { connect } from "react-redux";
+import Button from "./Button";
+import {createTimeFormat} from './RegistrationForm';
 
+const mapDispatchToProps = dispatch => {
+    return {
+      delete: (user) => {
+        dispatch({type: 'DELETE_PARTICIPANT', payload: user});
+      }
+    };
+  };
 
-
-const UserCard = ({id, name, secondName, time}) => {
+const UserCard = (props) => {
+    const {id, firstName, secondName, time} = props.user;
     const key = 'user_card_key';
+    /* jshint ignore:start */
     return(
         <div className="user-card" key={key +'_div'}>
-            <span key={key +'_id'}>ID: {id}</span>
-            <span key={key +'_name'}>Name: {name}</span>
-            <span key={key +'_secName'}>Second name: {secondName}</span>
-            <span key={key +'_time'}>Time: {time}</span>
-            <Button className="delete-user-btn" name="Delete"/>
+            <span key={key +'_id'}><b>ID:</b> {id}</span>
+            <span key={key +'_name'}><b>Name:</b> {firstName}</span>
+            <span key={key +'_secName'}><b>Surname:</b> {secondName}</span>
+            <span key={key +'_time'}><b>Time:</b> {createTimeFormat(time)}</span>
+            <Button className="delete-user" name="Delete" onClick={e => props.delete(props.user)}/>
         </div>
     )
-}
+     /* jshint ignore:end */
+};
 
-export default UserCard
+const UserCardWithStore = connect(null, mapDispatchToProps)(UserCard);
+
+export default UserCardWithStore;
