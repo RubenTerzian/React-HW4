@@ -1,6 +1,6 @@
 import {connect} from 'react-redux';
 import Button from './Button';
-import { createTimeFormat } from './RegistrationForm';
+import {createTimeFormat} from '../useTimer';
 
 
 const mapDispatchToProps = dispatch => {

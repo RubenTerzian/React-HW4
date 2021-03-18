@@ -3,34 +3,8 @@ import Input from "./Input";
 import uniqid from "uniqid";
 import { connect } from "react-redux";
 import { useState, useEffect } from "react";
+import useTimer, {createTimeFormat} from '../useTimer';
 
-export const createTimeFormat = (counter) => {
-    const timeConfig ={
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-      };
-
-      if(counter/60 < 1){
-        // seconds
-        timeConfig.seconds = counter;
-      }else{
-        if(counter/(60*60) < 1){
-          timeConfig.minutes = Math.floor(counter/60);
-          timeConfig.seconds = counter%(60);
-        }else{
-          timeConfig.hours = Math.floor(counter/(60*60));
-          timeConfig.minutes = Math.floor(counter/60%60);
-          timeConfig.seconds = counter%60;
-        }
-      }
-
-      const timeFormat = 
-           (timeConfig.hours<10 ? '0' + timeConfig.hours : timeConfig.hours) + ':' + 
-           (timeConfig.minutes<10 ? '0' + timeConfig.minutes : timeConfig.minutes) + ':' + 
-           (timeConfig.seconds<10 ? '0' + timeConfig.seconds : timeConfig.seconds);
-           return timeFormat;
-};
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -55,51 +29,37 @@ const mapDispatchToProps = dispatch => {
 
   const Timer = ({props}) =>{
 
-    const [time, setTime] = useState("00:00:00");
-    const [counter, setCounter] = useState(0);
-    const [startIsActive, setStartisActive] = useState(true);
+    const [startIsActive, setStartisActive] = useState(false);
     const [stopIsActive, setStopIsActive] = useState(false);
     const [resetIsActive, setResetIsActive] = useState(false);
     const [canselIsActive, setCanselIsActive] = useState(true);
 
     const {setCurrentParticipant, openTimer, addParticipant, currentParticipant} = props;
 
-    useEffect(()=>{
-      let intervalId;
-      if(!startIsActive){
-  
-        intervalId = setInterval(()=>{
-          const timeFormat = createTimeFormat(counter);
-          setTime(timeFormat);
-          setCounter(counter+1);
-        },20);
-      }
-      return () =>{
-          clearInterval(intervalId);
-      };
-    }, [startIsActive, setTime, counter]);
+    const [time, setTime, setCounter, counter] = useTimer(startIsActive, "00:00:00", 0);
+
   
     const handleStart = ()=>{
-        setStartisActive(false);
+        setStartisActive(true);
         setStopIsActive(true);
         setResetIsActive(false);
         setCanselIsActive(true);
     };
 
     const handleStop = ()=> {
-        setStartisActive(true);
+        setStartisActive(false);
         setStopIsActive(false);
         setResetIsActive(true);
         setCanselIsActive(true);
     };
     
     const handleReset = ()=>{
-        setStartisActive(true);
+        setStartisActive(false);
         setStopIsActive(false);
         setResetIsActive(false);
         setCanselIsActive(true);
-        setCounter(0);
-        setTime("00:00:00");
+        setCounter();
+        setTime();
     };
 
     const handleSave = () => {
@@ -127,7 +87,7 @@ const mapDispatchToProps = dispatch => {
                 <div className="timer-wraper">
                     <h1>{time}</h1>
                     <div className="btn_section">
-                        <Button className="start" name="Start" onClick={handleStart} disabled={!startIsActive || !stopIsActive && resetIsActive}/>  
+                        <Button className="start" name="Start" onClick={handleStart} disabled={startIsActive || !stopIsActive && resetIsActive}/>  
                         <Button className="stop" name="Stop" onClick={handleStop} disabled={!stopIsActive}/>  
                         <Button className="reset" name="Reset" onClick={handleReset} disabled={!resetIsActive}/>  
                     </div>

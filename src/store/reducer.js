@@ -19,7 +19,6 @@ export const reducer = (state=initState, action) => {
         
         case actionTypes.ADD_PARTICIPANT:
             localStorage.listOfUsers = JSON.stringify([payload, ...state.arrayForRender]);
-            console.log(state.arrayForRender);
             return {
                 ...state,
                 listOfUsers: [payload, ...state.listOfUsers],
@@ -29,7 +28,6 @@ export const reducer = (state=initState, action) => {
 
         case actionTypes.SHOW_WINNER:
             const winner = [...state.listOfUsers].sort((a,b) => a.time-b.time);
-            console.log(winner[0]);
             return {
                 ...state,
                 winner: winner[0],
