@@ -4,7 +4,8 @@ import RegistrationFormWithStore from './components/RegistrationForm';
 import WinnerInfoWithStore from './components/WinnerInfo';
 import Input from './components/Input';
 import {connect} from 'react-redux';
-
+import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
+import Button from './components/Button';
 
 const mapStateToProps = store => {
   return {
@@ -21,16 +22,44 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
+const Competitions = () => {
 
-function App(props) {
+  return(
+    <div className="competitions">
+      Da
+    </div>
+  )
+};
+
+const  CreateContest = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+  }
+  return(
+    <div className="create-contest-container">
+        <form action="submit" onSubmit={handleSubmit}>
+            <h2>Create contest</h2>
+            <div>
+                <label htmlFor="secondName">
+                    Contest name:
+                </label>
+                <Input name="contestName" type="text" placeholder="Enter contest name..."/>
+            </div>
+            <Button className={'create-contest'} name="Create"/>
+        </form>
+        
+    </div>
+  )
+}
+
+const Competition = (props) => {
   const {arrayForRender} = props;
   const handleFilter = (e) => {
     props.filter(e.target.value);
   };
-  /* jshint ignore:start */
-  return (
-      <div className="App">
-        <div className="users-container">
+  return(
+    <div className="competition">
+      <div className="users-container">
           <Input 
           name='searchParticipants' 
           placeholder="Enter participant name..." 
@@ -46,7 +75,25 @@ function App(props) {
           <RegistrationFormWithStore/>
           <WinnerInfoWithStore/>
         </div>
+    </div>
+  )
+};
+
+
+const CompetitionWithStore = connect(mapStateToProps, mapDispatchToProps)(Competition)
+
+function App(props) {
+  
+  /* jshint ignore:start */
+  return (
+    <BrowserRouter>
+      <div className="App">
+        <Link to="/competition">To competition</Link>
+        <Switch>
+          <Route path="/competition" component={CompetitionWithStore}/>
+        </Switch>
       </div>
+    </BrowserRouter>
 
   );
   /* jshint ignore:end */

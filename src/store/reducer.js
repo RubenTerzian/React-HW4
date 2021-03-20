@@ -3,12 +3,13 @@ import {actionTypes} from './actionTypes';
 
 
 const initState = {
-    listOfUsers: JSON.parse(localStorage.getItem('listOfUsers')) || [],
+    listOfUsers: [],
     winner: '',
-    arrayForRender: JSON.parse(localStorage.getItem('listOfUsers')) || [],
+    arrayForRender: [],
     isFilter: false,
     isTimerActive: false,
     currentParticipant: {},
+    isFinished: false,
 };
 
 export const reducer = (state=initState, action) => {
@@ -28,6 +29,7 @@ export const reducer = (state=initState, action) => {
 
         case actionTypes.SHOW_WINNER:
             const winner = [...state.listOfUsers].sort((a,b) => a.time-b.time);
+            console.log(winner[0]);
             return {
                 ...state,
                 winner: winner[0],
@@ -37,10 +39,10 @@ export const reducer = (state=initState, action) => {
             const index = state.listOfUsers.findIndex(participant => participant.id === payload.id);
             const listOfUsers = [...state.listOfUsers];
             listOfUsers.splice(index, 1);
-            const listOfUsersLS = JSON.parse(localStorage.getItem('listOfUsers'));
-            const indexLS = listOfUsersLS.findIndex(participant => participant.id === payload.id);
-            listOfUsersLS.splice(indexLS, 1);
-            localStorage.listOfUsers = JSON.stringify(listOfUsersLS);
+            // const listOfUsersLS = JSON.parse(localStorage.getItem('listOfUsers'));
+            // const indexLS = listOfUsersLS.findIndex(participant => participant.id === payload.id);
+            // listOfUsersLS.splice(indexLS, 1);
+            // localStorage.listOfUsers = JSON.stringify(listOfUsersLS);
             return {
                 ...state,
                 listOfUsers: listOfUsers,

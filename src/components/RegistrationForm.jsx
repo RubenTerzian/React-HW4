@@ -23,7 +23,8 @@ const mapDispatchToProps = dispatch => {
   const mapStateToProps = store => {
     return {
       isTimerActive: store.isTimerActive,
-      currentParticipant: store.currentParticipant
+      currentParticipant: store.currentParticipant,
+      isFinished: store.isFinished,
     };
   };
 
@@ -104,7 +105,7 @@ const mapDispatchToProps = dispatch => {
   };
 
 const RegistrationForm = (props) => {
-  const {openTimer, isTimerActive, setCurrentParticipant} = props;
+  const {openTimer, isTimerActive, setCurrentParticipant, isFinished} = props;
 
   const handleSubmit = (e) => {
       e.preventDefault();
@@ -112,7 +113,7 @@ const RegistrationForm = (props) => {
       if(firstName.value && secondName.value){
           if(firstName.value.match(/([A-z]|[а-я]|[А-Я])/) && secondName.value.match(/([A-z]|[а-я]|[А-Я])/)){
               const id = uniqid();
-              setCurrentParticipant(id, firstName.value, secondName.value);
+              setCurrentParticipant(id, firstName.value, secondName.value, isFinished);
               openTimer();
               firstName.value='';
               secondName.value='';

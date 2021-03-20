@@ -11,7 +11,7 @@ const mapDispatchToProps = dispatch => {
   };
 
 const UserCard = (props) => {
-    const {id, firstName, secondName, time} = props.user;
+    const {id, firstName, secondName, time, isFinished} = props.user;
     const key = 'user_card_key';
     /* jshint ignore:start */
     return(
@@ -20,7 +20,7 @@ const UserCard = (props) => {
             <span key={key +'_name'}><b>Name:</b> {firstName}</span>
             <span key={key +'_secName'}><b>Surname:</b> {secondName}</span>
             <span key={key +'_time'}><b>Time:</b> {createTimeFormat(time)}</span>
-            <Button className="delete-user" name="Delete" onClick={e => props.delete(props.user)}/>
+            {!isFinished && <Button className="delete-user" name="Delete" onClick={e => props.delete(props.user)}/>}
         </div>
     )
      /* jshint ignore:end */

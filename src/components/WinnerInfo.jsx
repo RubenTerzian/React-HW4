@@ -1,6 +1,7 @@
 import {connect} from 'react-redux';
 import Button from './Button';
 import {createTimeFormat} from '../useTimer';
+import {Link} from 'react-router-dom';
 
 
 const mapDispatchToProps = dispatch => {
@@ -32,7 +33,8 @@ const WinnerInfo = (props) => {
                     <span><b>Surname:</b> {winner.secondName}</span>
                     <span><b>Time:</b> {createTimeFormat(winner.time)}</span>
                 </div> :
-                <Button className='show-winner' name="Show winner" onClick={showWinner}/>
+                <Link to="/"><Button className='show-winner' name="Show winner" onClick={showWinner}/></Link>
+                
 
             }
         </div>
