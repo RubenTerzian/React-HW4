@@ -1,41 +1,32 @@
 import Button from "./Button";
 import Input from "./Input";
 import uniqid from "uniqid";
-import { connect } from "react-redux";
-import { useState, useEffect } from "react";
-import useTimer, {createTimeFormat} from '../useTimer';
+import { useState} from "react";
+import useTimer from '../useTimer'
+import { useDispatch } from "react-redux";
 
-
-const mapDispatchToProps = dispatch => {
+const actionCreater = dispatch => {
     return {
-      addParticipant: ({id, firstName, secondName, time}) => {
-        dispatch({type: 'ADD_PARTICIPANT', payload: {id, firstName, secondName, time}});
+      addParticipant: ({id, firstName, secondName, time, contest}) => {
+        dispatch({type: 'ADD_PARTICIPANT', payload: {id, firstName, secondName, time, contest}});
       },
-      openTimer: () => {
-        dispatch({type: 'OPEN_TIMER'});
+        openTimer: (contest) => {
+        dispatch({type: 'OPEN_TIMER', payload: {contest}});
       },
-      setCurrentParticipant: (id, firstName, secondName) => {
-        dispatch({type: 'SET_CURRENT_PATICIPANT', payload: {id, firstName, secondName}});
+        setCurrentParticipant: (id, firstName, secondName, contest) => {
+        dispatch({type: 'SET_CURRENT_PATICIPANT', payload: {id, firstName, secondName, contest}});
       },
     };
   };
 
-  const mapStateToProps = store => {
-    return {
-      isTimerActive: store.isTimerActive,
-      currentParticipant: store.currentParticipant,
-      isFinished: store.isFinished,
-    };
-  };
-
-  const Timer = ({props}) =>{
-
+  const Timer = ({contest}) =>{
+    const dispatch = useDispatch()
     const [startIsActive, setStartisActive] = useState(false);
     const [stopIsActive, setStopIsActive] = useState(false);
     const [resetIsActive, setResetIsActive] = useState(false);
     const [canselIsActive, setCanselIsActive] = useState(true);
 
-    const {setCurrentParticipant, openTimer, addParticipant, currentParticipant} = props;
+    const {currentParticipant} = contest;
 
     const [time, setTime, setCounter, counter] = useTimer(startIsActive, "00:00:00", 0);
 
@@ -65,17 +56,17 @@ const mapDispatchToProps = dispatch => {
 
     const handleSave = () => {
         if(counter){
-          addParticipant({...currentParticipant, time:counter});
-          setCurrentParticipant({});
-          openTimer();
+          actionCreater(dispatch).addParticipant({...currentParticipant, time:counter, contest});
+          actionCreater(dispatch).setCurrentParticipant({}, contest);
+          actionCreater(dispatch).openTimer();
         }else{
           alert('Время не может быть "00:00:00"');
         }
     };
 
     const handleCancel = () => {
-        setCurrentParticipant({});
-        props.openTimer();
+        actionCreater(dispatch).setCurrentParticipant({});
+        actionCreater(dispatch).openTimer();
     };
     /* jshint ignore:start */
     return  (
@@ -84,7 +75,7 @@ const mapDispatchToProps = dispatch => {
             <div className="common-wraper">
                 <h2>Participant</h2>  
                 <p><b>ID:</b> {currentParticipant.id}</p>
-                <p><b>Participant:</b> {currentParticipant.firstName + " " + currentParticipant.secondName}</p>
+                <p><b>Participant:</b> {contest.contestInfo.currentParticipant.firstName + " " + currentParticipant.secondName}</p>
                 <div className="timer-wraper">
                     <h1>{time}</h1>
                     <div className="btn_section">
@@ -104,17 +95,19 @@ const mapDispatchToProps = dispatch => {
   
   };
 
-const RegistrationForm = (props) => {
-  const {openTimer, isTimerActive, setCurrentParticipant, isFinished} = props;
-
+const RegistrationForm = ({contest}) => {
+    const { isTimerActive, isFinished } = contest;
+    const dispatch = useDispatch();
+  
+  console.log(contest)  
   const handleSubmit = (e) => {
       e.preventDefault();
       const {firstName, secondName} = e.target.elements;
       if(firstName.value && secondName.value){
           if(firstName.value.match(/([A-z]|[а-я]|[А-Я])/) && secondName.value.match(/([A-z]|[а-я]|[А-Я])/)){
               const id = uniqid();
-              setCurrentParticipant(id, firstName.value, secondName.value, isFinished);
-              openTimer();
+              actionCreater(dispatch).setCurrentParticipant(id, firstName.value, secondName.value, isFinished, contest);
+              actionCreater(dispatch).openTimer();
               firstName.value='';
               secondName.value='';
               firstName.className="";
@@ -156,13 +149,11 @@ const RegistrationForm = (props) => {
               </div>
               <Button className={'regis-patric'} name="Register participant"/>
           </form>
-          {isTimerActive && <Timer props={props}/>}
+          {isTimerActive && <Timer props={contest}/>}
       </div>
   )
   /* jshint ignore:end */
 
 };
 
-const RegistrationFormWithStore = connect(mapStateToProps, mapDispatchToProps)(RegistrationForm);
-
-export default RegistrationFormWithStore;
+export default RegistrationForm;

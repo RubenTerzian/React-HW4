@@ -1,4 +1,5 @@
-.App, .competition {
+.App,
+.contest {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -56,7 +57,8 @@ button:hover {
   margin-bottom: 10px;
 }
 
-.users-cards {
+.users-cards,
+.contests-list {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -67,7 +69,8 @@ button:hover {
   overflow: auto;
 }
 
-.user-card {
+.user-card,
+.contest-card {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -84,12 +87,14 @@ button:hover {
           box-shadow: 1px 0px 15px -4px rgba(14, 99, 165, 0.2);
 }
 
-.user-card span {
+.user-card span,
+.contest-card span {
   margin: 0 0 7px 7px;
   font-weight: 500;
 }
 
-.user-card .delete-user-btn {
+.user-card .delete-user-btn,
+.contest-card .delete-user-btn {
   background-color: red;
   margin-top: 15px;
   height: 30px;
@@ -176,7 +181,8 @@ button:hover {
   height: 25px;
 }
 
-.regis-patric-btn, .show-winner-btn {
+.regis-patric-btn,
+.show-winner-btn {
   width: 60%;
   height: 30px;
   -ms-flex-item-align: center;
@@ -335,7 +341,8 @@ button:hover {
           justify-content: space-between;
 }
 
-.common-wraper .final-btn-container .cancel-timer-btn, .common-wraper .final-btn-container .save-timer-btn {
+.common-wraper .final-btn-container .cancel-timer-btn,
+.common-wraper .final-btn-container .save-timer-btn {
   color: black;
 }
 /*# sourceMappingURL=App.css.map */

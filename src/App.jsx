@@ -1,40 +1,60 @@
 import './css/App.css';
-import UserCardWithStore from './components/UserCard';
-import RegistrationFormWithStore from './components/RegistrationForm';
-import WinnerInfoWithStore from './components/WinnerInfo';
 import Input from './components/Input';
-import {connect} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import { BrowserRouter, Link, Redirect, Route, Switch } from 'react-router-dom';
 import Button from './components/Button';
+import uniqid from "uniqid";
+import ContestCard from './components/ContestCard';
+import Contest from './components/Contest'
 
-const mapStateToProps = store => {
-  return {
-    listOfUsers: store.listOfUsers,
-    arrayForRender: store.arrayForRender,
+const Competitions = (props) => {
+
+  const compititionsArray = useSelector(state => state.compititionsArray);
+  const dispatch = useDispatch();
+
+  const handleFilter = (e) => {
+    dispatch({type: 'CONTESTS_FILTER', payload: e.target.value });
   };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    filter: (value) => {
-      dispatch({type: 'FILTER', payload: value});
-    }
-  };
-};
-
-const Competitions = () => {
 
   return(
     <div className="competitions">
-      Da
+      <Input 
+        name='searchContest'
+        placeholder="Enter contest name..."
+        onChange={handleFilter}
+      />
+      <Link to="/create"><Button className='create-contest' name="Create contest"/></Link>
+      <div className="contests-list">
+            {compititionsArray.map( (contest, index) => {
+              return <ContestCard contest={contest} index={index} route={props}/>
+            })}
+      </div>
     </div>
   )
 };
 
-const  CreateContest = () => {
+const CreateContest = (props) => {
+  
+  const dispatch = useDispatch();
+  console.log(props)
+  const contestInfo = {
+    listOfUsers: [],
+    winner: '',
+    arrayForRender: [],
+    isFilter: false,
+    isTimerActive: false,
+    currentParticipant: {},
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault()
+    const {contestName} = e.target.elements;
+    
+    const id = uniqid();
+    dispatch({ type: 'CREATE_CONTEST', payload: { contestName: contestName.value, id, contestInfo, isFinished: false } });
+    props.history.push('/')
   }
+
   return(
     <div className="create-contest-container">
         <form action="submit" onSubmit={handleSubmit}>
@@ -45,52 +65,28 @@ const  CreateContest = () => {
                 </label>
                 <Input name="contestName" type="text" placeholder="Enter contest name..."/>
             </div>
-            <Button className={'create-contest'} name="Create"/>
+            <Button className={'create-contest'} name={"Create"}/>
         </form>
         
     </div>
   )
 }
 
-const Competition = (props) => {
-  const {arrayForRender} = props;
-  const handleFilter = (e) => {
-    props.filter(e.target.value);
-  };
-  return(
-    <div className="competition">
-      <div className="users-container">
-          <Input 
-          name='searchParticipants' 
-          placeholder="Enter participant name..." 
-          onChange={handleFilter}
-          />
-          <div className="users-cards">
-            {arrayForRender.map( user => {
-                return <UserCardWithStore user={user}/>
-            })}
-          </div>
-        </div>
-        <div className="aside-container">
-          <RegistrationFormWithStore/>
-          <WinnerInfoWithStore/>
-        </div>
-    </div>
-  )
-};
 
-
-const CompetitionWithStore = connect(mapStateToProps, mapDispatchToProps)(Competition)
-
-function App(props) {
+function App() {
+  const compititionsArray = useSelector(state => state.compititionsArray);
   
   /* jshint ignore:start */
   return (
     <BrowserRouter>
       <div className="App">
-        <Link to="/competition">To competition</Link>
         <Switch>
-          <Route path="/competition" component={CompetitionWithStore}/>
+          <Route exact path="/" component={Competitions} />
+          <Route path="/create" component={CreateContest} />
+          {compititionsArray.map( (contest, index) => {
+              const id = contest.id
+            return <Route path={"/competition/:" + id} key={'key_' + contest + index} component={Contest}/>
+            })}
         </Switch>
       </div>
     </BrowserRouter>
@@ -99,4 +95,4 @@ function App(props) {
   /* jshint ignore:end */
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
