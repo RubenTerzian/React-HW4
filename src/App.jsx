@@ -36,7 +36,6 @@ const Competitions = (props) => {
 const CreateContest = (props) => {
   
   const dispatch = useDispatch();
-  console.log(props)
   const contestInfo = {
     listOfUsers: [],
     winner: '',
@@ -75,7 +74,6 @@ const CreateContest = (props) => {
 
 function App() {
   const compititionsArray = useSelector(state => state.compititionsArray);
-  
   /* jshint ignore:start */
   return (
     <BrowserRouter>

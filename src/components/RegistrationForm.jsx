@@ -3,30 +3,32 @@ import Input from "./Input";
 import uniqid from "uniqid";
 import { useState} from "react";
 import useTimer from '../useTimer'
-import { useDispatch } from "react-redux";
+import {useDispatch, useSelector} from 'react-redux';
 
 const actionCreater = dispatch => {
     return {
-      addParticipant: ({id, firstName, secondName, time, contest}) => {
-        dispatch({type: 'ADD_PARTICIPANT', payload: {id, firstName, secondName, time, contest}});
+      addParticipant: ({id, firstName, secondName, time}) => {
+        dispatch({type: 'ADD_PARTICIPANT', payload: {id, firstName, secondName, time}});
       },
-        openTimer: (contest) => {
-        dispatch({type: 'OPEN_TIMER', payload: {contest}});
+        openTimer: () => {
+        dispatch({type: 'OPEN_TIMER'});
       },
-        setCurrentParticipant: (id, firstName, secondName, contest) => {
-        dispatch({type: 'SET_CURRENT_PATICIPANT', payload: {id, firstName, secondName, contest}});
+        setCurrentParticipant: (id, firstName, secondName) => {
+        dispatch({type: 'SET_CURRENT_PATICIPANT', payload: {id, firstName, secondName}});
       },
     };
   };
 
-  const Timer = ({contest}) =>{
-    const dispatch = useDispatch()
+  const Timer = () =>{
+    const dispatch = useDispatch();
+    const contest = useSelector(state => state.currentContest);
+
     const [startIsActive, setStartisActive] = useState(false);
     const [stopIsActive, setStopIsActive] = useState(false);
     const [resetIsActive, setResetIsActive] = useState(false);
     const [canselIsActive, setCanselIsActive] = useState(true);
 
-    const {currentParticipant} = contest;
+    const {currentParticipant} = contest.contestInfo;
 
     const [time, setTime, setCounter, counter] = useTimer(startIsActive, "00:00:00", 0);
 
@@ -56,9 +58,8 @@ const actionCreater = dispatch => {
 
     const handleSave = () => {
         if(counter){
-          actionCreater(dispatch).addParticipant({...currentParticipant, time:counter, contest});
-          actionCreater(dispatch).setCurrentParticipant({}, contest);
-          actionCreater(dispatch).openTimer();
+          actionCreater(dispatch).addParticipant({...currentParticipant, time:counter});
+          actionCreater(dispatch).setCurrentParticipant({});
         }else{
           alert('Время не может быть "00:00:00"');
         }
@@ -95,18 +96,18 @@ const actionCreater = dispatch => {
   
   };
 
-const RegistrationForm = ({contest}) => {
-    const { isTimerActive, isFinished } = contest;
+const RegistrationForm = () => {
+    const contest = useSelector(state => state.currentContest);
+    const { isTimerActive, isFinished } = contest.contestInfo;
     const dispatch = useDispatch();
   
-  console.log(contest)  
   const handleSubmit = (e) => {
       e.preventDefault();
       const {firstName, secondName} = e.target.elements;
       if(firstName.value && secondName.value){
           if(firstName.value.match(/([A-z]|[а-я]|[А-Я])/) && secondName.value.match(/([A-z]|[а-я]|[А-Я])/)){
               const id = uniqid();
-              actionCreater(dispatch).setCurrentParticipant(id, firstName.value, secondName.value, isFinished, contest);
+              actionCreater(dispatch).setCurrentParticipant(id, firstName.value, secondName.value, isFinished);
               actionCreater(dispatch).openTimer();
               firstName.value='';
               secondName.value='';
@@ -149,7 +150,7 @@ const RegistrationForm = ({contest}) => {
               </div>
               <Button className={'regis-patric'} name="Register participant"/>
           </form>
-          {isTimerActive && <Timer props={contest}/>}
+          {isTimerActive && <Timer/>}
       </div>
   )
   /* jshint ignore:end */

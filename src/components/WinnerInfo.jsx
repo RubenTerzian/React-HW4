@@ -1,20 +1,18 @@
-import {connect, useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import Button from './Button';
 import {createTimeFormat} from '../useTimer';
 import {Link} from 'react-router-dom';
 
 
-const WinnerInfo = ({contest}) => {
- 
-    const dispatch = useDispatch()
-    console.log(contest)
+const WinnerInfo = () => {
+    const contest = useSelector(store => store.currentContest);
+    const dispatch = useDispatch();
     const {listOfUsers, winner} = contest.contestInfo;
-    console.log(listOfUsers, winner)
     
   const handleShowWinner = () => {
       
-        dispatch({type: 'SHOW_WINNER', payload: contest});
-    }
+        dispatch({type: 'SHOW_WINNER', payload: {}});
+    };
     /* jshint ignore:start */
     return(
         <div className="winner-info_container">

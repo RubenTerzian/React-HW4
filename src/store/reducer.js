@@ -4,10 +4,14 @@ import {actionTypes} from './actionTypes';
 
 const initState = {
     compititionsArray: [],
+    currentContest: {}
 };
 
 export const reducer = (state=initState, action) => {
     const {type, payload} = action;
+    let currentContestInfo = {...state.currentContest.contestInfo};
+    const contestIndex = state.compititionsArray.findIndex(contest => contest.id === state.currentContest.id);
+    const newArray = [...state.compititionsArray];
 
     switch (type) {
         
@@ -17,85 +21,100 @@ export const reducer = (state=initState, action) => {
                 ...state,
                 compititionsArray: [...state.compititionsArray, payload]
             };
+
+        case actionTypes.SET_CURRENT_CONTEST:
+            return {
+                ...state,
+                currentContest: payload
+            };
         
         case actionTypes.ADD_PARTICIPANT:
-            console.log(payload)
+            const {listOfUsers, arrayForRender} = currentContestInfo;
+            const contestInfo = {
+                ...currentContestInfo,
+                listOfUsers: [payload, ...listOfUsers],
+                arrayForRender: [payload, ...arrayForRender],
+                isTimerActive: !currentContestInfo.isTimerActive,
+                winer: '',
+            };
+            
+            newArray[contestIndex] = {...state.currentContest, contestInfo};
             return {
-                // ...state,
-                // listOfUsers: [payload, ...state.listOfUsers],
-                // arrayForRender: !state.isFilter ? [payload, ...state.arrayForRender] : [...state.arrayForRender],
-                // winner: '',
+                ...state,
+                compititionsArray: newArray,
+                currentContest: {...state.currentContest, contestInfo}
             };
 
         case actionTypes.SHOW_WINNER:
-            const winner = [...state.listOfUsers].sort((a,b) => a.time-b.time);
-            console.log(payload)
-
+            const winer = newArray[contestIndex].contestInfo.listOfUsers.sort((a,b) => a.time-b.time)
+            newArray[contestIndex].contestInfo.winer = winer[0];
+            newArray[contestIndex].isFinished = true;
+            console.log(newArray);
             return {
-                // ...state,
-                // winner: winner[0],
+                ...state,
+                compititionsArray: newArray,
+                currentContest: {}
             };
 
-        case actionTypes.DELETE_PARTICIPANT:
-            const index = state.listOfUsers.findIndex(participant => participant.id === payload.id);
-            const listOfUsers = [...state.listOfUsers];
-            listOfUsers.splice(index, 1);
-            console.log(payload)
+        // case actionTypes.DELETE_PARTICIPANT:
+        //     // const index = state.listOfUsers.findIndex(participant => participant.id === payload.id);
+        //     // const listOfUsers = [...state.listOfUsers];
+        //     // listOfUsers.splice(index, 1);
 
-            // const listOfUsersLS = JSON.parse(localStorage.getItem('listOfUsers'));
-            // const indexLS = listOfUsersLS.findIndex(participant => participant.id === payload.id);
-            // listOfUsersLS.splice(indexLS, 1);
-            // localStorage.listOfUsers = JSON.stringify(listOfUsersLS);
-            return {
-                // ...state,
-                // listOfUsers: listOfUsers,
-                // arrayForRender: listOfUsers,
-                // winner: '',
-            };
+        //     // const listOfUsersLS = JSON.parse(localStorage.getItem('listOfUsers'));
+        //     // const indexLS = listOfUsersLS.findIndex(participant => participant.id === payload.id);
+        //     // listOfUsersLS.splice(indexLS, 1);
+        //     // localStorage.listOfUsers = JSON.stringify(listOfUsersLS);
+        //     return {
+        //         // ...state,
+        //         // listOfUsers: listOfUsers,
+        //         // arrayForRender: listOfUsers,
+        //         // winner: '',
+        //     };
 
-        case actionTypes.FILTER:
-            const arrayForRender = state.listOfUsers.filter( participant => {
-                const valid = 
-                (participant.firstName.toLowerCase()).includes(payload.toLowerCase()) || 
-                (participant.id.toLowerCase()).includes(payload.toLowerCase());
-                return valid;
-            });
-            console.log(payload)
+        // case actionTypes.FILTER:
+        //     // const arrayForRender = state.listOfUsers.filter( participant => {
+        //     //     const valid = 
+        //     //     (participant.firstName.toLowerCase()).includes(payload.toLowerCase()) || 
+        //     //     (participant.id.toLowerCase()).includes(payload.toLowerCase());
+        //     //     return valid;
+        //     // });
 
-            return {
-                // ...state,
-                // arrayForRender: arrayForRender,
-                // isFilter: !payload ? false : true,
-            };
+        //     return {
+        //         // ...state,
+        //         // arrayForRender: arrayForRender,
+        //         // isFilter: !payload ? false : true,
+        //     };
         
-        case actionTypes.CONTESTS_FILTER:
-            console.log('filtering contests')
-            // const arrayForRender = state.listOfUsers.filter( participant => {
-            //     const valid = 
-            //     (participant.firstName.toLowerCase()).includes(payload.toLowerCase()) || 
-            //     (participant.id.toLowerCase()).includes(payload.toLowerCase());
-            //     return valid;
-            //   });
-            // return {
-            //     ...state,
-            //     arrayForRender: arrayForRender,
-            //     isFilter: !payload ? false : true,
-            // };
+        // case actionTypes.CONTESTS_FILTER:
+        //     console.log('filtering contests');
+        //     // const arrayForRender = state.listOfUsers.filter( participant => {
+        //     //     const valid = 
+        //     //     (participant.firstName.toLowerCase()).includes(payload.toLowerCase()) || 
+        //     //     (participant.id.toLowerCase()).includes(payload.toLowerCase());
+        //     //     return valid;
+        //     //   });
+        //     return {
+        //         ...state,
+        //         // arrayForRender: arrayForRender,
+        //         // isFilter: !payload ? false : true,
+        //     };
 
         case actionTypes.OPEN_TIMER:
-            console.log(payload)
-            
+            currentContestInfo.isTimerActive = !state.currentContest.contestInfo.isTimerActive;
             return {
-                // ...state,
-                // isTimerActive: !state.isTimerActive,
+                ...state,
+                currentContest: {...state.currentContest, contestInfo: currentContestInfo},
             };
 
         case actionTypes.SET_CURRENT_PATICIPANT:
-            console.log(payload)
+            
+            currentContestInfo = {...state.currentContest.contestInfo};
+            currentContestInfo.currentParticipant = payload;
             
             return {
-                // ...state,
-                // currentParticipant: payload,
+                ...state,
+                currentContest: {...state.currentContest, contestInfo: currentContestInfo},
             };
         default:
             return state;   

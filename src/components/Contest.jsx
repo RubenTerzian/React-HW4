@@ -8,11 +8,15 @@ const Contest = (props) => {
   const compititionsArray = useSelector(state => state.compititionsArray);
   const id = Object.keys(props.match.params)[0];
   const contest = compititionsArray.find(contest => contest.id === id);
-  console.log(contest)
+  const {contestInfo, isFinished} = contest;
+
   const dispatch = useDispatch();
+  // dispatch({type: 'SET_CURRENT_CONTEST', payload: contest});
   const handleFilter = (e) => {
     dispatch({ type: 'FILTER', payload: { filterParam: e.target.value, contest }});
   };
+
+  // console.log(contest.contestInfo.arrayForRender);
   return(
     <div className="contest">
       <div className="users-container">
@@ -22,14 +26,14 @@ const Contest = (props) => {
           onChange={handleFilter}
           />
           <div className="users-cards">
-            {contest.contestInfo.arrayForRender.map( user => {
-                return <UserCardWithStore user={user} />
+            {contestInfo.arrayForRender.map( user => {
+                return <UserCardWithStore user={user} isFinished={isFinished}/>
             })}
           </div>
         </div>
         <div className="aside-container">
-        <RegistrationForm contest={contest}/>
-        <WinnerInfo contest={contest}/>
+        {!isFinished && <RegistrationForm/>}
+        {!isFinished && <WinnerInfo/>}
         </div>
     </div>
   )
