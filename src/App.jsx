@@ -1,7 +1,7 @@
 import './css/App.css';
 import Input from './components/Input';
 import {useDispatch, useSelector} from 'react-redux';
-import { BrowserRouter, Link, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Redirect, Switch } from 'react-router-dom';
 import Button from './components/Button';
 import ContestCard from './components/ContestCard';
 import Contest from './components/Contest';
@@ -88,6 +88,7 @@ function App() {
               const id = contest.id
             return <Route path={"/competition/:" + id} key={'key_' + contest + index} component={Contest}/>
             })}
+            <Redirect to='/'/>
         </Switch>
       </div>
     </BrowserRouter>
