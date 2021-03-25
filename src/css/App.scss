@@ -6,6 +6,13 @@
   height: 100vh;
 }
 
+h2{
+  @media (max-width: 1200px) {
+    font-size: 16px;
+  }
+}
+
+
 button {
   align-self: center;
   transition: 0.3s;
@@ -30,7 +37,10 @@ button:hover {
   padding: 20px;
   margin: 20px;
   border: 1px #e2e2e2 solid;
-
+  @media (max-width: 1200px) {
+    padding: 20px 5px;
+    margin: 20px 5px;
+  }
   input {
     width: 100%;
     height: 40px;
@@ -80,6 +90,10 @@ button:hover {
   width: 30vw;
   margin: 20px;
 
+  @media (max-width: 1200px) {
+    padding: 20px 5px;
+    margin: 20px 5px;
+  }
   .to-competitions-btn, .reopen-competition-btn{
     width: 200px;
     height: 40px;
@@ -157,6 +171,10 @@ button:hover {
 
   h3 {
     margin-bottom: 35px;
+    @media (max-width: 1200px) {
+      font-size: 16px;
+      padding: 0 3px;
+    }
   }
   
 }

@@ -7,6 +7,12 @@
   height: 100vh;
 }
 
+@media (max-width: 1200px) {
+  h2 {
+    font-size: 16px;
+  }
+}
+
 button {
   -ms-flex-item-align: center;
       -ms-grid-row-align: center;
@@ -42,6 +48,13 @@ button:hover {
   padding: 20px;
   margin: 20px;
   border: 1px #e2e2e2 solid;
+}
+
+@media (max-width: 1200px) {
+  .users-container {
+    padding: 20px 5px;
+    margin: 20px 5px;
+  }
 }
 
 .users-container input {
@@ -115,6 +128,13 @@ button:hover {
           align-items: center;
   width: 30vw;
   margin: 20px;
+}
+
+@media (max-width: 1200px) {
+  .aside-container {
+    padding: 20px 5px;
+    margin: 20px 5px;
+  }
 }
 
 .aside-container .to-competitions-btn, .aside-container .reopen-competition-btn {
@@ -238,6 +258,13 @@ button:hover {
 
 .winner-info_container h3 {
   margin-bottom: 35px;
+}
+
+@media (max-width: 1200px) {
+  .winner-info_container h3 {
+    font-size: 16px;
+    padding: 0 3px;
+  }
 }
 
 .contest-winner-info {
