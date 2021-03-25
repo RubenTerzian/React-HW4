@@ -1,22 +1,27 @@
-import UserCardWithStore from './UserCard';
+import UserCard from './UserCard';
 import RegistrationForm from './RegistrationForm';
 import WinnerInfo from './WinnerInfo';
 import Input from './Input';
 import {useDispatch, useSelector} from 'react-redux';
+import Button from './Button';
+import { filterContest, filterPartisipant, reopenCompetition } from '../store/actionCreaters';
+import { useDebouncedCallback } from "use-debounce/lib";
+import { createTimeFormat } from '../useTimer';
+
 
 const Contest = (props) => {
-  const compititionsArray = useSelector(state => state.compititionsArray);
-  const id = Object.keys(props.match.params)[0];
-  const contest = compititionsArray.find(contest => contest.id === id);
-  const {contestInfo, isFinished} = contest;
-
+  const contest = useSelector(state => state.currentContest);
+  const {arrayForRender, isFinished, winner, contestName, id} = contest;
   const dispatch = useDispatch();
-  // dispatch({type: 'SET_CURRENT_CONTEST', payload: contest});
-  const handleFilter = (e) => {
-    dispatch({ type: 'FILTER', payload: { filterParam: e.target.value, contest }});
-  };
+  
+  const handleFilter = useDebouncedCallback((e) => {
+    filterPartisipant(dispatch, e.target.value);
+  },300);
 
-  // console.log(contest.contestInfo.arrayForRender);
+  const handleGoToHome = () => {
+    filterContest(dispatch, '');
+    props.history.push('/');
+  };
   return(
     <div className="contest">
       <div className="users-container">
@@ -26,14 +31,24 @@ const Contest = (props) => {
           onChange={handleFilter}
           />
           <div className="users-cards">
-            {contestInfo.arrayForRender.map( user => {
-                return <UserCardWithStore user={user} isFinished={isFinished}/>
+            {arrayForRender.map( user => {
+                return <UserCard user={user} isFinished={isFinished}/>
             })}
           </div>
         </div>
         <div className="aside-container">
-        {!isFinished && <RegistrationForm/>}
-        {!isFinished && <WinnerInfo/>}
+          <Button className="to-competitions" name='To competitions' onClick={handleGoToHome}/>
+          {isFinished && <Button className="reopen-competition" name='Reopen competition' onClick={() => reopenCompetition(dispatch)}/>} 
+          {isFinished &&
+          <div className="contest-winner-info">
+              <h2>Contest Info</h2>
+              <span><b>ID:</b> {id}</span>
+              <span><b>Name:</b> {contestName}</span>
+              <span><b>Winner:</b> {winner.firstName + ' ' + winner.secondName}</span>
+              <span><b>Time:</b> {createTimeFormat(winner.time)}</span>
+          </div>}
+          {!isFinished && <RegistrationForm/>}
+          {!isFinished && <WinnerInfo props={props}/>}
         </div>
     </div>
   )

@@ -1,30 +1,33 @@
 import {useDispatch, useSelector} from 'react-redux';
 import Button from './Button';
 import {createTimeFormat} from '../useTimer';
-import {Link} from 'react-router-dom';
+import { showWinner } from '../store/actionCreaters';
 
 
-const WinnerInfo = () => {
+const WinnerInfo = ({props}) => {
     const contest = useSelector(store => store.currentContest);
     const dispatch = useDispatch();
-    const {listOfUsers, winner} = contest.contestInfo;
-    
+    const {listOfUsers, winner, isFinished} = contest;
   const handleShowWinner = () => {
-      
-        dispatch({type: 'SHOW_WINNER', payload: {}});
+        if(listOfUsers.length){
+            showWinner(dispatch);
+            props.history.push('/');
+        }else{
+            alert('Должен быть минимум 1 участник');
+        } 
     };
     /* jshint ignore:start */
     return(
         <div className="winner-info_container">
             <h3>Total participants: {listOfUsers ?  listOfUsers.length :'0' }</h3>
-            {   winner ?
+            {   winner && isFinished ? 
                 <div className="winner-info">
                     <span><b>ID:</b> {winner.id}</span>
                     <span><b>Name:</b> {winner.firstName}</span>
                     <span><b>Surname:</b> {winner.secondName}</span>
                     <span><b>Time:</b> {createTimeFormat(winner.time)}</span>
                 </div> :
-                <Link to="/"><Button className='show-winner' name="Show winner" onClick={handleShowWinner}/></Link>
+                <Button className='show-winner' name="Show winner" onClick={handleShowWinner}/>
             }
         </div>
     )

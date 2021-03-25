@@ -2,120 +2,145 @@ import {actionTypes} from './actionTypes';
 
 
 
-const initState = {
+const initState = JSON.parse(localStorage.getItem('state')) || {
     compititionsArray: [],
+    compititionsArrayForRender: [],
     currentContest: {}
 };
 
+
+
 export const reducer = (state=initState, action) => {
     const {type, payload} = action;
-    let currentContestInfo = {...state.currentContest.contestInfo};
+    let currentContest = {...state.currentContest};
     const contestIndex = state.compititionsArray.findIndex(contest => contest.id === state.currentContest.id);
     const newArray = [...state.compititionsArray];
+    const {listOfUsers, arrayForRender} = currentContest;
 
     switch (type) {
         
         case actionTypes.CREATE_CONTEST:
-            localStorage.compititionsArray = JSON.stringify([payload, ...state.compititionsArray]);
             return {
                 ...state,
-                compititionsArray: [...state.compititionsArray, payload]
+                compititionsArray: [...state.compititionsArray, payload],
+                compititionsArrayForRender: [...state.compititionsArrayForRender, payload],
             };
 
         case actionTypes.SET_CURRENT_CONTEST:
+
             return {
                 ...state,
                 currentContest: payload
             };
         
         case actionTypes.ADD_PARTICIPANT:
-            const {listOfUsers, arrayForRender} = currentContestInfo;
-            const contestInfo = {
-                ...currentContestInfo,
+            const contest = {
+                ...currentContest,
                 listOfUsers: [payload, ...listOfUsers],
                 arrayForRender: [payload, ...arrayForRender],
-                isTimerActive: !currentContestInfo.isTimerActive,
-                winer: '',
+                isTimerActive: !currentContest.isTimerActive,
+                winner: '',
             };
             
-            newArray[contestIndex] = {...state.currentContest, contestInfo};
+            newArray[contestIndex] = {...contest};
             return {
                 ...state,
                 compititionsArray: newArray,
-                currentContest: {...state.currentContest, contestInfo}
+                compititionsArrayForRender: newArray,
+                currentContest: {...contest}
             };
 
         case actionTypes.SHOW_WINNER:
-            const winer = newArray[contestIndex].contestInfo.listOfUsers.sort((a,b) => a.time-b.time)
-            newArray[contestIndex].contestInfo.winer = winer[0];
+            const winner = newArray[contestIndex].listOfUsers.sort((a,b) => a.time-b.time)
+            newArray[contestIndex].winner = winner[0];
             newArray[contestIndex].isFinished = true;
-            console.log(newArray);
             return {
                 ...state,
                 compititionsArray: newArray,
+                compititionsArrayForRender: newArray,
                 currentContest: {}
             };
 
-        // case actionTypes.DELETE_PARTICIPANT:
-        //     // const index = state.listOfUsers.findIndex(participant => participant.id === payload.id);
-        //     // const listOfUsers = [...state.listOfUsers];
-        //     // listOfUsers.splice(index, 1);
-
-        //     // const listOfUsersLS = JSON.parse(localStorage.getItem('listOfUsers'));
-        //     // const indexLS = listOfUsersLS.findIndex(participant => participant.id === payload.id);
-        //     // listOfUsersLS.splice(indexLS, 1);
-        //     // localStorage.listOfUsers = JSON.stringify(listOfUsersLS);
-        //     return {
-        //         // ...state,
-        //         // listOfUsers: listOfUsers,
-        //         // arrayForRender: listOfUsers,
-        //         // winner: '',
-        //     };
-
-        // case actionTypes.FILTER:
-        //     // const arrayForRender = state.listOfUsers.filter( participant => {
-        //     //     const valid = 
-        //     //     (participant.firstName.toLowerCase()).includes(payload.toLowerCase()) || 
-        //     //     (participant.id.toLowerCase()).includes(payload.toLowerCase());
-        //     //     return valid;
-        //     // });
-
-        //     return {
-        //         // ...state,
-        //         // arrayForRender: arrayForRender,
-        //         // isFilter: !payload ? false : true,
-        //     };
-        
-        // case actionTypes.CONTESTS_FILTER:
-        //     console.log('filtering contests');
-        //     // const arrayForRender = state.listOfUsers.filter( participant => {
-        //     //     const valid = 
-        //     //     (participant.firstName.toLowerCase()).includes(payload.toLowerCase()) || 
-        //     //     (participant.id.toLowerCase()).includes(payload.toLowerCase());
-        //     //     return valid;
-        //     //   });
-        //     return {
-        //         ...state,
-        //         // arrayForRender: arrayForRender,
-        //         // isFilter: !payload ? false : true,
-        //     };
-
-        case actionTypes.OPEN_TIMER:
-            currentContestInfo.isTimerActive = !state.currentContest.contestInfo.isTimerActive;
+        case actionTypes.REOPEN_COMPETITION:
+            newArray[contestIndex].isFinished = false
+            console.log(newArray)
             return {
                 ...state,
-                currentContest: {...state.currentContest, contestInfo: currentContestInfo},
+                compititionsArray: newArray,
+                compititionsArrayForRender: newArray,
+                currentContest: {...currentContest, isFinished: false}
+            };
+
+        case actionTypes.DELETE_PARTICIPANT:
+            const index = state.currentContest.listOfUsers.findIndex(participant => participant.id === payload.id);
+            const newListOfUsers = [...listOfUsers];
+            newListOfUsers.splice(index, 1);
+            newArray[contestIndex].listOfUsers = newListOfUsers;
+            newArray[contestIndex].arrayForRender = newListOfUsers;
+            newArray[contestIndex].winner = '';
+
+            return {
+                ...state,
+                currentContest: {...currentContest, listOfUsers: newListOfUsers, arrayForRender: newListOfUsers, winner: ''}
+            };
+
+        case actionTypes.FILTER_PARTICIPANT:
+            const partisipantFilteredArray = currentContest
+            .listOfUsers.filter( participant => {
+                const valid = 
+                (participant.firstName.toLowerCase()).includes(payload.filterParam.toLowerCase()) || 
+                (participant.id.toLowerCase()).includes(payload.filterParam.toLowerCase());
+                return valid;
+            });
+
+            return {
+                ...state,
+                currentContest: {...currentContest, arrayForRender: partisipantFilteredArray}
+            };
+    
+        
+        case actionTypes.CONTESTS_FILTER:
+            const constestFilteredArray = state.compititionsArray.filter( contest => {
+                const valid = 
+                (contest.contestName.toLowerCase()).includes(payload.filterParam.toLowerCase()) || 
+                (contest.id.toLowerCase()).includes(payload.filterParam.toLowerCase());
+                return valid;
+              });
+            return {
+                ...state,
+                compititionsArrayForRender: constestFilteredArray,
+            };
+
+        case actionTypes.OPEN_TIMER:
+            return {
+                ...state,
+                currentContest: {...state.currentContest, isTimerActive: !state.currentContest.isTimerActive},
             };
 
         case actionTypes.SET_CURRENT_PATICIPANT:
             
-            currentContestInfo = {...state.currentContest.contestInfo};
-            currentContestInfo.currentParticipant = payload;
             
             return {
                 ...state,
-                currentContest: {...state.currentContest, contestInfo: currentContestInfo},
+                currentContest: {...state.currentContest, currentParticipant: payload},
             };
+
+        case actionTypes.SAVE_TO_LOCALSTORAGE:
+                localStorage.state = JSON.stringify(state);
+            return state;
+
+        case actionTypes.DELETE_CONTEST:
+
+            const contestIndexInArray = state.compititionsArray.findIndex(contest => contest.id === payload.id);
+            const newCompititionsArray = [...state.compititionsArray];
+            newCompititionsArray.splice(contestIndexInArray, 1);
+            
+            return {
+                ...state,
+                compititionsArray: newCompititionsArray,
+                compititionsArrayForRender: newCompititionsArray,
+            };
+
         default:
             return state;   
     }

@@ -4,6 +4,7 @@ import uniqid from "uniqid";
 import { useState} from "react";
 import useTimer from '../useTimer'
 import {useDispatch, useSelector} from 'react-redux';
+import { addParticipant, openTimer, setCurrentParticipant } from "../store/actionCreaters";
 
 const actionCreater = dispatch => {
     return {
@@ -28,7 +29,7 @@ const actionCreater = dispatch => {
     const [resetIsActive, setResetIsActive] = useState(false);
     const [canselIsActive, setCanselIsActive] = useState(true);
 
-    const {currentParticipant} = contest.contestInfo;
+    const {currentParticipant} = contest;
 
     const [time, setTime, setCounter, counter] = useTimer(startIsActive, "00:00:00", 0);
 
@@ -58,16 +59,16 @@ const actionCreater = dispatch => {
 
     const handleSave = () => {
         if(counter){
-          actionCreater(dispatch).addParticipant({...currentParticipant, time:counter});
-          actionCreater(dispatch).setCurrentParticipant({});
+          addParticipant(dispatch, {...currentParticipant, time:counter});
+          setCurrentParticipant(dispatch, {});
         }else{
           alert('Время не может быть "00:00:00"');
         }
     };
 
     const handleCancel = () => {
-        actionCreater(dispatch).setCurrentParticipant({});
-        actionCreater(dispatch).openTimer();
+        setCurrentParticipant(dispatch, {});
+        openTimer(dispatch);
     };
     /* jshint ignore:start */
     return  (
@@ -76,7 +77,7 @@ const actionCreater = dispatch => {
             <div className="common-wraper">
                 <h2>Participant</h2>  
                 <p><b>ID:</b> {currentParticipant.id}</p>
-                <p><b>Participant:</b> {contest.contestInfo.currentParticipant.firstName + " " + currentParticipant.secondName}</p>
+                <p><b>Participant:</b> {contest.currentParticipant.firstName + " " + currentParticipant.secondName}</p>
                 <div className="timer-wraper">
                     <h1>{time}</h1>
                     <div className="btn_section">
@@ -98,7 +99,7 @@ const actionCreater = dispatch => {
 
 const RegistrationForm = () => {
     const contest = useSelector(state => state.currentContest);
-    const { isTimerActive, isFinished } = contest.contestInfo;
+    const { isTimerActive, isFinished } = contest;
     const dispatch = useDispatch();
   
   const handleSubmit = (e) => {
