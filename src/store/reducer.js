@@ -134,11 +134,11 @@ export const reducer = (state=initState, action) => {
             const contestIndexInArray = state.compititionsArray.findIndex(contest => contest.id === payload.id);
             const newCompititionsArray = [...state.compititionsArray];
             newCompititionsArray.splice(contestIndexInArray, 1);
-            
             return {
                 ...state,
                 compititionsArray: newCompititionsArray,
                 compititionsArrayForRender: newCompititionsArray,
+                currentContest: {}
             };
 
         default:
